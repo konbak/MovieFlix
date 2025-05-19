@@ -10,6 +10,6 @@ interface MovieDetailsService {
     @GET("3/movie/{movieId}")
     suspend fun getMovieDetails(
         @Path("movieId") movieId: Int,
-        @Query("language") language: String = "en-US"
+        @Query("append_to_response") appendToResponse: String = "credits"
     ): MovieDetails
 }

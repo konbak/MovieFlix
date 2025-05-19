@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.example.designsystem.components.MovieHeaderSection
@@ -75,11 +76,11 @@ internal fun DetailsStateLessScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Column(modifier = modifier) {
+            Column(Modifier.padding(horizontal = 8.dp)) {
                 Text(
                     text = it.releaseDate,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = Color.Gray,
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -87,13 +88,41 @@ internal fun DetailsStateLessScreen(
                 RatingStars(it.voteAverage)
             }
 
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Column(Modifier.padding(horizontal = 8.dp)) {
+                Text(
+                    text = stringResource(R.string.runtime_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color.Black,
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = it.runtime,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = it.runtime,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
+            Column(Modifier.padding(horizontal = 8.dp)) {
+                Text(
+                    text = stringResource(R.string.description_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color.Black,
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = it.overview,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                )
+            }
         }
     }
 }
