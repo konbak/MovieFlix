@@ -2,4 +2,5 @@
 <resources>
     <string name="runtime_title">Runtime</string>
     <string name="description_title">Description</string>
+    <string name="reviews_title">Reviews</string>"
 </resources>

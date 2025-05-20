@@ -133,6 +133,15 @@ internal fun DetailsStateLessScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            Text(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                text = stringResource(R.string.reviews_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = Color.Black,
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
             reviews?.let {
                 LazyColumn {
                     items(reviews) { review ->
