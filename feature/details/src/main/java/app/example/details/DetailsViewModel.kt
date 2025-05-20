@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import app.example.domain.shared.FavoritesManager
 import app.example.domain.usecase.GetMovieDetailsUseCase
 import app.example.domain.usecase.GetReviewsUseCase
+import app.example.domain.usecase.GetSimilarMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class DetailsViewModel @Inject constructor(
     private val getMovieDetailsUseCase: GetMovieDetailsUseCase,
     private val getReviewsUseCase: GetReviewsUseCase,
+    private val getSimilarMoviesUseCase: GetSimilarMoviesUseCase,
     private val favoritesManager: FavoritesManager,
 ) : ViewModel() {
 
@@ -26,6 +28,7 @@ class DetailsViewModel @Inject constructor(
         when (event) {
             is DetailsEvent.LoadMovieDetails -> loadMovie(event.movieId)
             is DetailsEvent.LoadMovieReviews -> loadReviews(event.movieId)
+            is DetailsEvent.LoadSimilarMovies -> loadSimilarMovies(event.movieId)
             is DetailsEvent.ToggleFavorite -> toggleFavorite(event.movieId)
         }
     }
@@ -60,6 +63,19 @@ class DetailsViewModel @Inject constructor(
                 _uiState.update { it.copy(reviews = reviews) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(reviewsError = e.message ?: "Unknown error loading reviews") }
+            }
+        }
+    }
+
+    private fun loadSimilarMovies(movieId: Int) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(similarMovies = emptyList(), similarMoviesError = null) }
+
+            try {
+                val similarMovies = getSimilarMoviesUseCase(movieId)
+                _uiState.update { it.copy(similarMovies = similarMovies) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(similarMoviesError = e.message ?: "Unknown error loading similar movies") }
             }
         }
     }
