@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,7 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.example.designsystem.components.MovieHeaderSection
 import app.example.designsystem.components.RatingStars
+import app.example.designsystem.components.ReviewItem
 import app.example.domain.model.MovieDetailsDomain
+import app.example.domain.model.ReviewDomain
 
 @Composable
 fun DetailsScreen(
@@ -31,6 +35,7 @@ fun DetailsScreen(
 
     LaunchedEffect(movieId) {
         viewModel.onEvent(DetailsEvent.LoadMovieDetails(movieId))
+        viewModel.onEvent(DetailsEvent.LoadMovieReviews(movieId))
     }
 
     val uiState = viewModel.uiState.collectAsState()
@@ -40,6 +45,7 @@ fun DetailsScreen(
             DetailsStateLessScreen(
                 modifier = Modifier.padding(paddingValues),
                 movie = uiState.value.movie,
+                reviews = uiState.value.reviews,
                 isFavorite = uiState.value.isFavorite,
                 onFavoriteClick = { viewModel.onEvent(DetailsEvent.ToggleFavorite(movieId)) },
                 onShareClick = {
@@ -58,6 +64,7 @@ fun DetailsScreen(
 internal fun DetailsStateLessScreen(
     modifier: Modifier = Modifier,
     movie: MovieDetailsDomain?,
+    reviews: List<ReviewDomain>?,
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
@@ -122,6 +129,19 @@ internal fun DetailsStateLessScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                 )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            reviews?.let {
+                LazyColumn {
+                    items(reviews) { review ->
+                        ReviewItem(
+                            author = review.author,
+                            content = review.content
+                        )
+                    }
+                }
             }
         }
     }

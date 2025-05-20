@@ -3,6 +3,7 @@ package app.example.data.di
 import app.example.data.mapper.DateFormatter
 import app.example.data.mapper.MovieDetailsMapper
 import app.example.data.mapper.MovieMapper
+import app.example.data.mapper.ReviewMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,5 +28,11 @@ object MapperModule {
     @Singleton
     fun provideMovieDetailsMapper(dateFormatter: DateFormatter): MovieDetailsMapper {
         return MovieDetailsMapper(dateFormatter)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReviewMapper(): ReviewMapper {
+        return ReviewMapper()
     }
 }

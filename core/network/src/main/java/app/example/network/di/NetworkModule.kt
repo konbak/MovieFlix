@@ -2,6 +2,7 @@ package app.example.network.di
 
 import app.example.network.service.MovieDetailsService
 import app.example.network.service.PopularService
+import app.example.network.service.ReviewsService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,5 +52,11 @@ object NetworkModule {
     @Singleton
     fun provideMovieDetailsService(retrofit: Retrofit): MovieDetailsService {
         return retrofit.create(MovieDetailsService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReviewsService(retrofit: Retrofit): ReviewsService {
+        return retrofit.create(ReviewsService::class.java)
     }
 }

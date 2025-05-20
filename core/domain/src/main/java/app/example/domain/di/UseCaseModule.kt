@@ -2,8 +2,10 @@ package app.example.domain.di
 
 import app.example.domain.repository.MovieDetailsRepository
 import app.example.domain.repository.MoviesRepository
+import app.example.domain.repository.ReviewsRepository
 import app.example.domain.usecase.GetMovieDetailsUseCase
 import app.example.domain.usecase.GetPopularMoviesUseCase
+import app.example.domain.usecase.GetReviewsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,5 +30,13 @@ object UseCaseModule {
         movieDetailsRepository: MovieDetailsRepository
     ): GetMovieDetailsUseCase {
         return GetMovieDetailsUseCase(movieDetailsRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetReviewsUseCase(
+        reviewsRepository: ReviewsRepository
+    ): GetReviewsUseCase {
+        return GetReviewsUseCase(reviewsRepository)
     }
 }

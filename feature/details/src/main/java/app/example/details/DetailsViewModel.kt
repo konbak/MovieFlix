@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.example.domain.shared.FavoritesManager
 import app.example.domain.usecase.GetMovieDetailsUseCase
+import app.example.domain.usecase.GetReviewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val getMovieDetailsUseCase: GetMovieDetailsUseCase,
+    private val getReviewsUseCase: GetReviewsUseCase,
     private val favoritesManager: FavoritesManager,
 ) : ViewModel() {
 
@@ -23,6 +25,7 @@ class DetailsViewModel @Inject constructor(
     fun onEvent(event: DetailsEvent) {
         when (event) {
             is DetailsEvent.LoadMovieDetails -> loadMovie(event.movieId)
+            is DetailsEvent.LoadMovieReviews -> loadReviews(event.movieId)
             is DetailsEvent.ToggleFavorite -> toggleFavorite(event.movieId)
         }
     }
@@ -44,6 +47,19 @@ class DetailsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(isLoading = false, error = e.message ?: "Unknown error")
                 }
+            }
+        }
+    }
+
+    private fun loadReviews(movieId: Int) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(reviews = emptyList(), reviewsError = null) }
+
+            try {
+                val reviews = getReviewsUseCase(movieId)
+                _uiState.update { it.copy(reviews = reviews) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(reviewsError = e.message ?: "Unknown error loading reviews") }
             }
         }
     }
