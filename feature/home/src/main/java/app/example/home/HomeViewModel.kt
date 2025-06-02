@@ -9,12 +9,14 @@ import app.example.domain.shared.FavoritesManager
 import app.example.domain.usecase.GetPopularMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     getPopularMoviesUseCase: GetPopularMoviesUseCase,
-    private val favoritesManager: FavoritesManager
+    private val favoritesManager: FavoritesManager,
+    private val snackbarManager: SnackbarManager
 ) : ViewModel() {
 
     val moviesFlow: Flow<PagingData<MovieDomain>> = getPopularMoviesUseCase()
@@ -22,7 +24,19 @@ class HomeViewModel @Inject constructor(
 
     val favoriteIds = favoritesManager.favoriteIds
 
-    fun toggleFavorite(movieId: Int) {
-        favoritesManager.toggleFavorite(movieId)
+    val snackbarMessages = snackbarManager.events
+
+    fun toggleFavorite(movie: MovieDomain) {
+        favoritesManager.toggleFavorite(movie.id)
+
+        viewModelScope.launch {
+            val isFavorite = favoritesManager.isFavorite(movie.id)
+            snackbarManager.emit(
+                UiEvent.FavoriteStatusMessage(
+                    added = isFavorite,
+                    movieTitle = movie.title
+                )
+            )
+        }
     }
 }

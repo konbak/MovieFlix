@@ -20,26 +20,26 @@ fun MovieFlixNavigation() {
         navController = navController,
         startDestination = MovieFlixScreens.HomeScreen.name
     ) {
-        composable(route = MovieFlixScreens.HomeScreen.name) {
-            val homeViewModel = hiltViewModel<HomeViewModel>()
-            HomeScreen(
-                navController = navController,
-                viewModel = homeViewModel,
-            )
-        }
-
-        composable(
-            route = "${MovieFlixScreens.DetailsScreen.name}/{movieId}",
-            arguments = listOf(navArgument("movieId") {
-                type = NavType.IntType
-            })
-        ) { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
-            val detailsViewModel = hiltViewModel<DetailsViewModel>()
-            DetailsScreen(
-                movieId = movieId,
-                viewModel = detailsViewModel,
-            )
-        }
+//        composable(route = MovieFlixScreens.HomeScreen.name) {
+//            val homeViewModel = hiltViewModel<HomeViewModel>()
+//            HomeScreen(
+//                navController = navController,
+//                viewModel = homeViewModel,
+//            )
+//        }
+//
+//        composable(
+//            route = "${MovieFlixScreens.DetailsScreen.name}/{movieId}",
+//            arguments = listOf(navArgument("movieId") {
+//                type = NavType.IntType
+//            })
+//        ) { backStackEntry ->
+//            val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
+//            val detailsViewModel = hiltViewModel<DetailsViewModel>()
+//            DetailsScreen(
+//                movieId = movieId,
+//                viewModel = detailsViewModel,
+//            )
+//        }
     }
 }

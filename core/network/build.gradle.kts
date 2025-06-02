@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "app.example.network"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 28

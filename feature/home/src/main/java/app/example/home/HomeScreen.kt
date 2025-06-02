@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,14 +31,35 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    //navController: NavController,
+    onMovieSelected: (Int) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val movies = viewModel.moviesFlow.collectAsLazyPagingItems()
     val isRefreshing = movies.loadState.refresh is LoadState.Loading
     val favoriteIds = viewModel.favoriteIds.collectAsState()
+    val context = LocalContext.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.snackbarMessages.collect { event ->
+            val message = when (event) {
+                is UiEvent.FavoriteStatusMessage -> {
+                    if (event.added) {
+                        context.getString(R.string.added_to_favorites, event.movieTitle)
+                    } else {
+                        context.getString(R.string.removed_from_favorites, event.movieTitle)
+                    }
+                }
+            }
+
+            snackbarHostState.showSnackbar(message)
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         content = { paddingValues ->
             HomeStateLessScreen(
                 modifier = Modifier.padding(paddingValues),
@@ -42,12 +67,13 @@ fun HomeScreen(
                 movies = movies,
                 favoriteIds = favoriteIds.value,
                 onRefresh = { movies.refresh() },
-                onFavoriteClick = { movieId ->
-                    viewModel.toggleFavorite(movieId)
+                onFavoriteClick = { movie ->
+                    viewModel.toggleFavorite(movie)
                 },
                 onMovieSelected = { movieId ->
                     Log.v("HomeScreen", "Movie selected: $movieId")
-                    navController.navigate(MovieFlixScreens.DetailsScreen.name +"/"+movieId)
+                    onMovieSelected(movieId)
+                    //navController.navigate(MovieFlixScreens.DetailsScreen.name +"/"+movieId)
                 }
             )
         }
@@ -62,7 +88,7 @@ internal fun HomeStateLessScreen(
     movies: LazyPagingItems<MovieDomain>,
     favoriteIds: Set<Int>,
     onRefresh: () -> Unit,
-    onFavoriteClick: (Int) -> Unit = {},
+    onFavoriteClick: (MovieDomain) -> Unit = {},
     onMovieSelected: (Int) -> Unit = {}
 ) {
     PullToRefreshBox(
@@ -84,7 +110,7 @@ internal fun HomeStateLessScreen(
                     voteAverage = movie?.voteAverage ?: 0.0,
                     releaseDate = movie?.releaseDate.orEmpty(),
                     isFavorite = isFavorite,
-                    onFavoriteClick = { movie?.let { movieId -> onFavoriteClick(movieId.id) } },
+                    onFavoriteClick = { movie?.let { movieId -> onFavoriteClick(movieId) } },
                     onClick = { movie?.let { movieId -> onMovieSelected(movieId.id) } }
                 )
             }

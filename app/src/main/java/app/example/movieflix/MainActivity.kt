@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import app.example.designsystem.theme.MovieFlixTheme
 import app.example.movieflix.navigation.MovieFlixNavigation
+import app.example.movieflix.navigation.MovieFlixNavigation3
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,7 +38,8 @@ fun MovieFlixApp() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MovieFlixNavigation()
+            //MovieFlixNavigation()
+            MovieFlixNavigation3()
         }
     }
 }

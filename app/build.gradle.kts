@@ -3,17 +3,18 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.dagger.hilt)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "app.example.movieflix"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.example.movieflix"
         minSdk = 28
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -70,4 +71,18 @@ dependencies {
     implementation(project(":feature:details"))
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
+
+    // Core runtime for Jetpack Navigation 3 library — provides navigation components and APIs
+    implementation(libs.androidx.navigation3.runtime)
+
+    // UI components for Navigation 3 — includes NavDisplay etc.
+    implementation(libs.androidx.navigation3.ui)
+
+    // ViewModel integration with Navigation 3 — provides lifecycle-aware ViewModels scoped to navigation destinations
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
+    implementation(libs.androidx.activity.compose.v1120alpha01)
+
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.serialization.core)
 }

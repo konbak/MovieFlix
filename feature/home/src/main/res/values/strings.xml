@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="added_to_favorites">Movie %s added to favorites</string>
+    <string name="removed_from_favorites">Movie %s removed from favorites</string>
+</resources>

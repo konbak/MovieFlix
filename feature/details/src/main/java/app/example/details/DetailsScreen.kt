@@ -34,7 +34,8 @@ import app.example.domain.model.SimilarMovieDomain
 @Composable
 fun DetailsScreen(
     movieId: Int,
-    viewModel: DetailsViewModel = hiltViewModel()
+    viewModel: DetailsViewModel = hiltViewModel(),
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
 
