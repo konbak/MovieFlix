@@ -1,6 +1,6 @@
 [versions]
 activityComposeVersion = "1.12.0-alpha04"
-agp = "8.11.0"
+agp = "8.11.1"
 kotlin = "2.2.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -29,6 +29,7 @@ converterGson = "3.0.0"
 coilCompose = "2.7.0"
 kotlinxSerializationCore = "1.9.0"
 kotlinxSerializationJson = "1.9.0"
+detekt = "1.23.8"
 
 [libraries]
 androidx-activity-compose-v1120alpha01 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
@@ -67,6 +68,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 slf4j-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimpleVersion" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -76,4 +78,6 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 google-dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "13.0.0" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.8" }
 
