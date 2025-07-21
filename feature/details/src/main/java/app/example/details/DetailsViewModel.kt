@@ -33,57 +33,50 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
+    private fun applyResult(result: DetailsResult) {
+        _uiState.update { currentState ->
+            reduce(currentState, result)
+        }
+    }
+
     private fun loadMovie(movieId: Int) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-
+            applyResult(DetailsResult.Loading)
             try {
                 val movie = getMovieDetailsUseCase(movieId)
-                _uiState.update {
-                    it.copy(
-                        movie = movie,
-                        isLoading = false,
-                        isFavorite = favoritesManager.isFavorite(movieId)
-                    )
-                }
+                val isFavorite = favoritesManager.isFavorite(movieId)
+                applyResult(DetailsResult.MovieLoaded(movie, isFavorite))
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(isLoading = false, error = e.message ?: "Unknown error")
-                }
+                applyResult(DetailsResult.MovieLoadError(e.message ?: "Unknown error"))
             }
         }
     }
 
     private fun loadReviews(movieId: Int) {
         viewModelScope.launch {
-            _uiState.update { it.copy(reviews = emptyList(), reviewsError = null) }
-
             try {
                 val reviews = getReviewsUseCase(movieId)
-                _uiState.update { it.copy(reviews = reviews) }
+                applyResult(DetailsResult.ReviewsLoaded(reviews))
             } catch (e: Exception) {
-                _uiState.update { it.copy(reviewsError = e.message ?: "Unknown error loading reviews") }
+                applyResult(DetailsResult.ReviewsLoadError(e.message ?: "Error loading reviews"))
             }
         }
     }
 
     private fun loadSimilarMovies(movieId: Int) {
         viewModelScope.launch {
-            _uiState.update { it.copy(similarMovies = emptyList(), similarMoviesError = null) }
-
             try {
                 val similarMovies = getSimilarMoviesUseCase(movieId)
-                _uiState.update { it.copy(similarMovies = similarMovies) }
+                applyResult(DetailsResult.SimilarMoviesLoaded(similarMovies))
             } catch (e: Exception) {
-                _uiState.update { it.copy(similarMoviesError = e.message ?: "Unknown error loading similar movies") }
+                applyResult(DetailsResult.SimilarMoviesLoadError(e.message ?: "Error loading similar movies"))
             }
         }
     }
 
     private fun toggleFavorite(movieId: Int) {
         favoritesManager.toggleFavorite(movieId)
-        _uiState.update {
-            it.copy(isFavorite = favoritesManager.isFavorite(movieId))
-        }
+        val isFavorite = favoritesManager.isFavorite(movieId)
+        applyResult(DetailsResult.FavoriteToggled(isFavorite))
     }
 }

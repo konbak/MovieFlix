@@ -30,6 +30,10 @@ coilCompose = "2.7.0"
 kotlinxSerializationCore = "1.9.0"
 kotlinxSerializationJson = "1.9.0"
 detekt = "1.23.8"
+mockk = "1.14.4"
+coroutines-test = "1.10.2"
+paging = "3.3.6"
+kotlinTest = "1.8.21"
 
 [libraries]
 androidx-activity-compose-v1120alpha01 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
@@ -69,6 +73,10 @@ slf4j-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSi
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines-test" }
+paging-common = { module = "androidx.paging:paging-common", version.ref = "paging" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlinTest" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
