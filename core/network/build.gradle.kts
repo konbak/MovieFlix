@@ -53,4 +53,7 @@ dependencies {
     implementation (libs.okhttp)
     implementation (libs.converter.gson)
     implementation (libs.gson)
+
+    //module
+    implementation (project(":core:domain"))
 }

@@ -1,5 +1,6 @@
 package app.example.details
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,10 +14,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +34,7 @@ import app.example.designsystem.components.SimilarMovieItem
 import app.example.domain.model.MovieDetailsDomain
 import app.example.domain.model.ReviewDomain
 import app.example.domain.model.SimilarMovieDomain
+import app.example.domain.shared.DomainError
 
 @Composable
 fun DetailsScreen(
@@ -38,6 +43,7 @@ fun DetailsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(movieId) {
         viewModel.onEvent(DetailsEvent.LoadMovieDetails(movieId))
@@ -47,7 +53,14 @@ fun DetailsScreen(
 
     val uiState = viewModel.uiState.collectAsState()
 
+    LaunchedEffect(uiState.value.error) {
+        uiState.value.error?.let { error ->
+            snackbarHostState.showSnackbar(message = error.toMessage(context))
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         content = { paddingValues ->
             DetailsStateLessScreen(
                 modifier = Modifier.padding(paddingValues),
@@ -66,6 +79,12 @@ fun DetailsScreen(
             )
         }
     )
+}
+
+fun DomainError.toMessage(context: Context): String = when(this) {
+    is DomainError.Network -> "test1"
+    is DomainError.Server -> "test2"
+    is DomainError.Unknown -> "test3"
 }
 
 @Composable

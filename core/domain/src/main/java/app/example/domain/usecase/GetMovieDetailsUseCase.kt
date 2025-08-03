@@ -2,12 +2,12 @@ package app.example.domain.usecase
 
 import app.example.domain.model.MovieDetailsDomain
 import app.example.domain.repository.MovieDetailsRepository
+import app.example.domain.shared.Result
 import javax.inject.Inject
 
 class GetMovieDetailsUseCase @Inject constructor(
     private val repository: MovieDetailsRepository
 ) {
-    suspend operator fun invoke(movieId: Int): MovieDetailsDomain {
-        return repository.getMovieDetails(movieId)
-    }
+    suspend operator fun invoke(movieId: Int): Result<MovieDetailsDomain> =
+        repository.getMovieDetails(movieId)
 }

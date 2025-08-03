@@ -2,6 +2,7 @@ package app.example.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.example.domain.model.MovieDetailsDomain
 import app.example.domain.shared.FavoritesManager
 import app.example.domain.usecase.GetMovieDetailsUseCase
 import app.example.domain.usecase.GetReviewsUseCase
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import app.example.domain.shared.Result
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,34 +44,36 @@ class DetailsViewModel @Inject constructor(
     private fun loadMovie(movieId: Int) {
         viewModelScope.launch {
             applyResult(DetailsResult.Loading)
-            try {
-                val movie = getMovieDetailsUseCase(movieId)
-                val isFavorite = favoritesManager.isFavorite(movieId)
-                applyResult(DetailsResult.MovieLoaded(movie, isFavorite))
-            } catch (e: Exception) {
-                applyResult(DetailsResult.MovieLoadError(e.message ?: "Unknown error"))
+
+            val result: Result<MovieDetailsDomain> = getMovieDetailsUseCase(movieId)
+
+            when (result) {
+                is Result.Success -> {
+                    val isFavorite = favoritesManager.isFavorite(movieId)
+                    applyResult(DetailsResult.MovieLoaded(result.data, isFavorite))
+                }
+
+                is Result.Error -> {
+                    applyResult(DetailsResult.MovieLoadError(result.error))
+                }
             }
         }
     }
 
     private fun loadReviews(movieId: Int) {
         viewModelScope.launch {
-            try {
-                val reviews = getReviewsUseCase(movieId)
-                applyResult(DetailsResult.ReviewsLoaded(reviews))
-            } catch (e: Exception) {
-                applyResult(DetailsResult.ReviewsLoadError(e.message ?: "Error loading reviews"))
+            when (val result = getReviewsUseCase(movieId)) {
+                is Result.Success -> applyResult(DetailsResult.ReviewsLoaded(result.data))
+                is Result.Error -> applyResult(DetailsResult.ReviewsLoadError(result.error))
             }
         }
     }
 
     private fun loadSimilarMovies(movieId: Int) {
         viewModelScope.launch {
-            try {
-                val similarMovies = getSimilarMoviesUseCase(movieId)
-                applyResult(DetailsResult.SimilarMoviesLoaded(similarMovies))
-            } catch (e: Exception) {
-                applyResult(DetailsResult.SimilarMoviesLoadError(e.message ?: "Error loading similar movies"))
+            when (val result = getSimilarMoviesUseCase(movieId)) {
+                is Result.Success -> applyResult(DetailsResult.SimilarMoviesLoaded(result.data))
+                is Result.Error -> applyResult(DetailsResult.SimilarMoviesLoadError(result.error))
             }
         }
     }
