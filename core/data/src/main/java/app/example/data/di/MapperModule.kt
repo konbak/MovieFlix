@@ -27,12 +27,6 @@ object MapperModule {
 
     @Provides
     @Singleton
-    fun provideMovieDetailsMapper(dateFormatter: DateFormatter): MovieDetailsMapper {
-        return MovieDetailsMapper(dateFormatter)
-    }
-
-    @Provides
-    @Singleton
     fun provideReviewMapper(): ReviewMapper {
         return ReviewMapper()
     }
