@@ -8,7 +8,15 @@ import app.example.domain.model.MovieDomain
 import app.example.domain.shared.FavoritesManager
 import app.example.domain.usecase.GetPopularMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,21 +30,51 @@ class HomeViewModel @Inject constructor(
     val moviesFlow: Flow<PagingData<MovieDomain>> = getPopularMoviesUseCase()
         .cachedIn(viewModelScope)
 
-    val favoriteIds = favoritesManager.favoriteIds
+    private val _state = MutableStateFlow(HomeState(movies = moviesFlow))
+    val state: StateFlow<HomeState> = _state.asStateFlow()
 
     val snackbarMessages = snackbarManager.events
 
-    fun toggleFavorite(movie: MovieDomain) {
-        favoritesManager.toggleFavorite(movie.id)
+    private val _effects = MutableSharedFlow<HomeEffect>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val effects: SharedFlow<HomeEffect> = _effects.asSharedFlow()
 
+    init {
         viewModelScope.launch {
-            val isFavorite = favoritesManager.isFavorite(movie.id)
+            favoritesManager.favoriteIds.collect { ids ->
+                applyResult(HomeResult.FavoritesUpdated(ids))
+            }
+        }
+    }
+
+    fun onIntent(intent: HomeIntent) {
+        when (intent) {
+            HomeIntent.Refresh -> Unit
+            is HomeIntent.ToggleFavorite -> handleToggleFavorite(intent.movie)
+            is HomeIntent.ClickMovie -> emitEffect(HomeEffect.NavigateToDetails(intent.movieId))
+        }
+    }
+
+    private fun handleToggleFavorite(movie: MovieDomain) {
+        favoritesManager.toggleFavorite(movie.id)
+        viewModelScope.launch {
+            val isFav = favoritesManager.isFavorite(movie.id)
             snackbarManager.emit(
                 UiEvent.FavoriteStatusMessage(
-                    added = isFavorite,
+                    added = isFav,
                     movieTitle = movie.title
                 )
             )
         }
+    }
+
+    private fun applyResult(result: HomeResult) {
+        _state.update { it.reduce(result) }
+    }
+
+    private fun emitEffect(effect: HomeEffect) {
+        _effects.tryEmit(effect)
     }
 }

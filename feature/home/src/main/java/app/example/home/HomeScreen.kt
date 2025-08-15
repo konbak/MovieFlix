@@ -13,6 +13,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,12 +36,11 @@ fun HomeScreen(
     onMovieSelected: (Int) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val movies = viewModel.moviesFlow.collectAsLazyPagingItems()
+    val state by viewModel.state.collectAsState()
+    val movies = state.movies.collectAsLazyPagingItems()
     val isRefreshing = movies.loadState.refresh is LoadState.Loading
-    val favoriteIds = viewModel.favoriteIds.collectAsState()
-    val context = LocalContext.current
-
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.snackbarMessages.collect { event ->
@@ -58,6 +58,14 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                is HomeEffect.NavigateToDetails -> onMovieSelected(effect.movieId)
+            }
+        }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         content = { paddingValues ->
@@ -65,14 +73,16 @@ fun HomeScreen(
                 modifier = Modifier.padding(paddingValues),
                 isRefreshing = isRefreshing,
                 movies = movies,
-                favoriteIds = favoriteIds.value,
-                onRefresh = { movies.refresh() },
+                favoriteIds = state.favoriteIds,
+                onRefresh = {
+                    viewModel.onIntent(HomeIntent.Refresh)
+                    movies.refresh()
+                },
                 onFavoriteClick = { movie ->
-                    viewModel.toggleFavorite(movie)
+                    viewModel.onIntent(HomeIntent.ToggleFavorite(movie))
                 },
                 onMovieSelected = { movieId ->
-                    Log.v("HomeScreen", "Movie selected: $movieId")
-                    onMovieSelected(movieId)
+                    viewModel.onIntent(HomeIntent.ClickMovie(movieId))
                     //navController.navigate(MovieFlixScreens.DetailsScreen.name +"/"+movieId)
                 }
             )
