@@ -43,25 +43,18 @@ fun HomeScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.snackbarMessages.collect { event ->
-            val message = when (event) {
-                is UiEvent.FavoriteStatusMessage -> {
-                    if (event.added) {
-                        context.getString(R.string.added_to_favorites, event.movieTitle)
-                    } else {
-                        context.getString(R.string.removed_from_favorites, event.movieTitle)
-                    }
-                }
-            }
-
-            snackbarHostState.showSnackbar(message)
-        }
-    }
-
-    LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
                 is HomeEffect.NavigateToDetails -> onMovieSelected(effect.movieId)
+
+                is HomeEffect.ShowFavoriteStatus -> {
+                    val message = if (effect.added) {
+                        context.getString(R.string.added_to_favorites, effect.movieTitle)
+                    } else {
+                        context.getString(R.string.removed_from_favorites, effect.movieTitle)
+                    }
+                    snackbarHostState.showSnackbar(message)
+                }
             }
         }
     }

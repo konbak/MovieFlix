@@ -24,7 +24,6 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     getPopularMoviesUseCase: GetPopularMoviesUseCase,
     private val favoritesManager: FavoritesManager,
-    private val snackbarManager: SnackbarManager
 ) : ViewModel() {
 
     val moviesFlow: Flow<PagingData<MovieDomain>> = getPopularMoviesUseCase()
@@ -32,8 +31,6 @@ class HomeViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(HomeState(movies = moviesFlow))
     val state: StateFlow<HomeState> = _state.asStateFlow()
-
-    val snackbarMessages = snackbarManager.events
 
     private val _effects = MutableSharedFlow<HomeEffect>(
         extraBufferCapacity = 1,
@@ -58,11 +55,12 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleToggleFavorite(movie: MovieDomain) {
-        favoritesManager.toggleFavorite(movie.id)
         viewModelScope.launch {
+            favoritesManager.toggleFavorite(movie.id)
             val isFav = favoritesManager.isFavorite(movie.id)
-            snackbarManager.emit(
-                UiEvent.FavoriteStatusMessage(
+
+            emitEffect(
+                HomeEffect.ShowFavoriteStatus(
                     added = isFav,
                     movieTitle = movie.title
                 )
